@@ -1,0 +1,14 @@
+Acest exemplu de aplicatie pentru sistemul de e-ticketing îndeplineste toate cerintele mentionate. 
+Utilizeaza clasele Ticket, TicketService, CSVService si AuditService pentru reprezentarea, gestionarea biletelor si serviciile asociate.
+Colectia tickets este folosita pentru stocarea biletelor, iar colectiile sunt implementate utilizând List<Ticket>.
+
+Fisierele CSV sunt utilizate pentru persistenta datelor.
+CSVService ofera metode pentru citirea si scrierea biletelor în/din fisiere CSV. 
+De asemenea, AuditService este responsabil pentru înregistrarea actiunilor într-un fisier de audit.
+
+Clasa Main reprezinta punctul de intrare în aplicatie si ofera un meniu interactiv în consola pentru efectuarea actiunilor definite. 
+La pornirea aplicatiei, datele sunt încarcate din fisierul tickets.csv, iar la închiderea aplicatiei, datele sunt salvate în acelasi fisier. 
+Actiunile utilizatorului si marcajele de timp asociate sunt înregistrate în fisierul de audit audit.csv.
+
+Notitie: fisierele tickets.csv si audit.csv trebuie create în acelasi director cu fisierul sursa Java înainte de a rula aplicatia. 
+Puteti ajusta codul si adauga sau modifica clasele, metodele si actiunile în functie de cerintele specifice ale sistemului de e-ticketing.

@@ -1,0 +1,281 @@
+import java.io.*;
+import java.util.*;
+
+// Clasa pentru reprezentarea unui bilet
+class Ticket {
+    private String evId;
+    private String evName;
+    private double price;
+    private int quantity;
+
+    public Ticket(String evId, String evName, double price, int quantity) {
+        this.evId = evId;
+        this.evName = evName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    // Metode de acces pentru atribute
+    public String getevId() {
+        return evId;
+    }
+
+    public String getevName() {
+        return evName;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+}
+
+// Clasa de serviciu pentru gestionarea biletelor
+class TicketService {
+    private List<Ticket> tickets;
+    private FileWriter auditWriter;
+
+    public TicketService() {
+        tickets = new ArrayList<>();
+        try {
+            auditWriter = new FileWriter("audit.csv", true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodă pentru adăugarea unui bilet nou
+    public void addTicket(Ticket ticket) {
+        tickets.add(ticket);
+        writeAudit("Adăugare bilet");
+    }
+
+    // Metodă pentru ștergerea unui bilet
+    public void deleteTicket(String evId) {
+        tickets.removeIf(ticket -> ticket.getevId().equals(evId));
+        writeAudit("Ștergere bilet");
+    }
+
+    // Metodă pentru obținerea unui bilet după ID-ul evenimentului
+    public Ticket getTicketById(String evId) {
+        for (Ticket ticket : tickets) {
+            if (ticket.getevId().equals(evId)) {
+                return ticket;
+            }
+        }
+        return null;
+    }
+
+    // Metodă pentru obținerea tuturor biletelor
+    public List<Ticket> getAllTickets() {
+        return tickets;
+    }
+
+    // Metodă pentru calcularea valorii totale a biletelor disponibile
+    public double calculateTotalValue() {
+        double totalValue = 0.0;
+        for (Ticket ticket : tickets) {
+            totalValue += ticket.getPrice() * ticket.getQuantity();
+        }
+        return totalValue;
+    }
+
+    // Metodă pentru scrierea în fișierul de audit
+    private void writeAudit(String action) {
+        try {
+            auditWriter.write(action + "," + new Date().getTime() + "\n");
+            auditWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodă pentru închiderea fișierului de audit
+    public void closeAuditFile() {
+        try {
+            auditWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// Clasa de serviciu pentru gestionarea fișierelor CSV
+class CSVService {
+    private static CSVService instance;
+
+    private CSVService() {}
+
+    public static CSVService getInstance() {
+        if (instance == null) {
+            instance = new CSVService();
+        }
+        return instance;
+    }
+
+    // Metodă pentru citirea biletelor din fișierul CSV
+    public List<Ticket> readTicketsFromFile(String filename) {
+        List<Ticket> tickets = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                String evId = data[0];
+                String evName = data[1];
+                double price = Double.parseDouble(data[2]);
+                int quantity = Integer.parseInt(data[3]);
+                Ticket ticket = new Ticket(evId, evName, price, quantity);
+                tickets.add(ticket);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    // Scrierea biletelor în fișierul CSV
+    public void writeTicketsToFile(List<Ticket> tickets, String filename) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            for (Ticket ticket : tickets) {
+                String line = ticket.getevId() + "," + ticket.getevName() + "," + ticket.getPrice() + "," + ticket.getQuantity();
+                writer.write(line);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// Clasa de serviciu pentru audit
+class AuditService {
+    private FileWriter auditWriter;
+
+    public AuditService() {
+        try {
+            auditWriter = new FileWriter("audit.csv", true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodă pentru înregistrarea unei acțiuni în fișierul de audit
+    public void logAction(String action) {
+        try {
+            auditWriter.write(action + "," + new Date().getTime() + "\n");
+            auditWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodă pentru închiderea fișierului de audit
+    public void closeAuditFile() {
+        try {
+            auditWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        TicketService ticketService = new TicketService();
+        CSVService csvService = CSVService.getInstance();
+        AuditService auditService = new AuditService();
+
+        // se vor incarcara datele din fisier la pornirea aplicației
+        List<Ticket> tickets = csvService.readTicketsFromFile("tickets.csv");
+        ticketService.addTicket(tickets);
+
+        boolean running = true;
+        while (running) {
+            System.out.println("\n==== Meniu ====");
+            System.out.println("1. Adaugare bilet");
+            System.out.println("2. Stergere bilet");
+            System.out.println("3. Cautare bilet dupa ID eveniment");
+            System.out.println("4. Listare toate biletele");
+            System.out.println("5. Calcul valoare totala bilete");
+            System.out.println("6. Iesire");
+
+            System.out.print("Alegeți o opțiune: ");
+            int option = scanner.nextInt();
+            scanner.nextLine(); // Consuma newline
+
+            switch (option) {
+                case 1:
+                    System.out.print("Introduceți ID eveniment: ");
+                    String evId = scanner.nextLine();
+                    System.out.print("Introduceți nume eveniment: ");
+                    String evName = scanner.nextLine();
+                    System.out.print("Introduceți preț: ");
+                    double price = scanner.nextDouble();
+                    System.out.print("Introduceți cantitate: ");
+                    int quantity = scanner.nextInt();
+                    ticketService.addTicket(new Ticket(evId, evName, price, quantity));
+                    auditService.logAction("Adăugare bilet");
+                    break;
+                case 2:
+                    System.out.print("Introduceți ID eveniment pentru ștergere: ");
+                    String deleteevId = scanner.nextLine();
+                    ticketService.deleteTicket(deleteevId);
+                    auditService.logAction("Ștergere bilet");
+                    break;
+                case 3:
+                    System.out.print("Introduceți ID eveniment pentru căutare: ");
+                    String searchevId = scanner.nextLine();
+                    Ticket ticket = ticketService.getTicketById(searchevId);
+                    if (ticket != null) {
+                        System.out.println("Bilet găsit:");
+                        System.out.println("ID eveniment: " + ticket.getevId());
+                        System.out.println("Nume eveniment: " + ticket.getevName());
+                        System.out.println("Preț: " + ticket.getPrice());
+                        System.out.println("Cantitate: " + ticket.getQuantity());
+                    } else {
+                        System.out.println("Niciun bilet găsit pentru ID evenimentul specificat.");
+                    }
+                    break;
+                case 4:
+                    List<Ticket> allTickets = ticketService.getAllTickets();
+                    if (allTickets.isEmpty()) {
+                        System.out.println("Nu există bilete disponibile.");
+                    } else {
+                        System.out.println("Bilete disponibile:");
+                        for (Ticket t : allTickets) {
+                            System.out.println("ID eveniment: " + t.getevId());
+                            System.out.println("Nume eveniment: " + t.getevName());
+                            System.out.println("Preț: " + t.getPrice());
+                            System.out.println("Cantitate: " + t.getQuantity());
+                            System.out.println("-------------------------");
+                        }
+                    }
+                    break;
+                case 5:
+                    double totalValue = ticketService.calculateTotalValue();
+                    System.out.println("Valoarea totala a biletelor disponibile: " + totalValue);
+                    break;
+                case 6:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Opriune invalida. Va rugam sa alegeti din nou.");
+                    break;
+            }
+        }
+
+        // Salvarea datelor la inchiderea aplicatiei
+        csvService.writeTicketsToFile(ticketService.getAllTickets(), "tickets.csv");
+
+        // Inchiderea fisierului de audit
+        auditService.closeAuditFile();
+    }
+}

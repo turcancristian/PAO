@@ -1,0 +1,64 @@
+Pentru a separa programul generat in mai multe fisiere, putem crea fisiere separate pentru fiecare clasa si putem organiza clasele in pachete corespunzatoare. Iata cum putem face acest lucru:
+
+Clasa Ticket poate fi definita intr-un fisier separat, de exemplu Ticket.java.
+
+Clasa TicketService poate fi definita intr-un alt fisier separat, de exemplu TicketService.java.
+
+Clasa CSVService poate fi definita intr-un fisier separat, de exemplu CSVService.java.
+
+Clasa AuditService poate fi definita intr-un alt fisier separat, de exemplu AuditService.java.
+
+Clasa Main poate fi definita intr-un fisier separat, de exemplu Main.java.
+
+Dupa ce am separat clasele in fisiere individuale, putem crea un director (folder) pentru fiecare pachet si sa organizam fisierele in functie de pachetele din care fac parte. De exemplu:
+
+css
+Copy code
+src/
+├── model/
+│   └── Ticket.java
+├── service/
+│   ├── TicketService.java
+│   ├── CSVService.java
+│   └── AuditService.java
+└── Main.java
+Apoi, putem asigura ca clasele sunt importate corespunzator in fisierul Main.java pentru a putea utiliza functionalitatile acestora.
+
+Aceasta abordare de organizare a fisierelor si pachetelor faciliteaza mentinerea si extensibilitatea codului, deoarece fiecare clasa este definita in propriul fisier si este mai usor sa localizam si sa modificam specificatiile unei clase.
+
+
+
+
+
+User
+cum ne asiguram ca clasele sunt importate corespunzator in fisierul 'Main.java' ?
+ChatGPT
+Pentru a ne asigura ca clasele sunt importate corespunzator in fisierul Main.java, putem utiliza declaratiile de import (import) pentru fiecare clasa pe care o utilizam in fisierul Main.java.
+
+De exemplu, daca avem urmatoarea structura de fisiere:
+
+css
+Copy code
+src/
+├── model/
+│   └── Ticket.java
+├── service/
+│   ├── TicketService.java
+│   ├── CSVService.java
+│   └── AuditService.java
+└── Main.java
+in fisierul Main.java, trebuie sa adaugam declaratiile de import pentru clasele pe care le utilizam din alte pachete. Aceasta se face prin adaugarea liniei de cod import la inceputul fisierului Main.java pentru fiecare clasa pe care o utilizam.
+
+De exemplu, daca clasa Main din fisierul Main.java utilizeaza clasele Ticket, TicketService, CSVService si AuditService, declaratiile de import ar putea arata astfel:
+
+java
+Copy code
+import model.Ticket;
+import service.TicketService;
+import service.CSVService;
+import service.AuditService;
+
+public class Main {
+    // Codul clasei Main
+}
+Astfel, prin adaugarea declaratiilor de import corespunzatoare in fisierul Main.java, ne asiguram ca putem utiliza clasele respective si ca compilatorul va putea gasi definitiile acestora in fisierele separate.
